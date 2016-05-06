@@ -6,7 +6,12 @@
 <html lang="en">
 <head>
 
-    <base href="${config.issuer}">
+    <!-- base href="${config.issuer}"-->
+    <c:set var="req" value="${pageContext.request}" />
+	<c:set var="uri" value="${req.requestURI}" />
+	<c:set var="url">${req.requestURL}</c:set>
+	<base href="${fn:substring(url, 0, fn:length(url) - fn:length(uri))}${req.contextPath}/" />
+	<!-- base href="${req.contextPath}/" /-->
 
     <meta charset="utf-8">
     <title>Simple Web App - ${title}</title>
