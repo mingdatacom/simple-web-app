@@ -11,6 +11,10 @@
 	</appender>
 	
 	<!-- Application Loggers -->
+	<logger name="org.mitre.openid.connect">
+		<level value="debug" />
+	</logger>
+	
 	<logger name="org.mitre.web">
 		<level value="info" />
 	</logger>
