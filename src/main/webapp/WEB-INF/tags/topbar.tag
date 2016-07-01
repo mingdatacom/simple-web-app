@@ -54,14 +54,6 @@
 							</c:otherwise>
 						</c:choose>
 						<c:choose>
-							<c:when test="${pageName == 'Admin'}">
-								<li class="active"><a href="#">Admin</a></li>
-							</c:when>
-							<c:otherwise>
-								<li><a href="admin">Admin</a></li>
-							</c:otherwise>
-						</c:choose>
-						<c:choose>
 							<c:when test="${pageName == 'Logout'}">
 								<li class="active"><a href="#">Logout</a></li>
 							</c:when>

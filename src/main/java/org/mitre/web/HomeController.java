@@ -45,9 +45,6 @@ public class HomeController {
 	@Autowired
 	private OIDCAuthenticationFilter filter;
 	
-	@Resource(name = "namedAdmins")
-	private Set<SubjectIssuerGrantedAuthority> admins;
-	
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
@@ -60,8 +57,6 @@ public class HomeController {
 		model.addAttribute("authRequestOptionsServiceClass", filter.getAuthRequestOptionsService().getClass().getSimpleName());
 		model.addAttribute("authRequestUriBuilderClass", filter.getAuthRequestUrlBuilder().getClass().getSimpleName());
 		
-		model.addAttribute("admins", admins);
-
 		return "home";
 	}
 
@@ -69,20 +64,6 @@ public class HomeController {
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public String user(Principal p) {
 		return "user";
-	}
-
-	@RequestMapping("/open")
-	public String open(Principal p) {
-		return "open";
-	}
-
-	@RequestMapping("/admin")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public String admin(Model model, Principal p) {
-
-		model.addAttribute("admins", admins);
-
-		return "admin";
 	}
 
 	@RequestMapping("/login")
