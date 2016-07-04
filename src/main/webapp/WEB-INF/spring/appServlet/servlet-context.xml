@@ -171,6 +171,7 @@
 				<entry key="max_age" value="30" />
 				<entry key="prompt" value="none" />
 				-->
+				<entry key="display" value="loginpage" />
 			</map>
 		</property>
 	</bean>

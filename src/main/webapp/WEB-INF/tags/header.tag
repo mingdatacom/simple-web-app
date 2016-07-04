@@ -36,21 +36,6 @@
     		return ${userInfoJson};
     	}
 		
-		// get the authorities of the current user, if available (null otherwise)
-		function getUserAuthorities() {
-			return ${userAuthorities};
-		}
-		
-		// is the current user an admin?
-		// NOTE: this is just for  
-		function isAdmin() {
-			var auth = getUserAuthorities();
-			if (auth && _.contains(auth, "ROLE_ADMIN")) {
-				return true;
-			} else {
-				return false;
-			}
-		}
     </script>    
 </head>
 

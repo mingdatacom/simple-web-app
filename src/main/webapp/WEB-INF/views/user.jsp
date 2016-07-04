@@ -30,6 +30,10 @@
 					</tbody>				
 				</table>
 				
+				<h3>Access Token</h3>
+				<security:authentication property="accessTokenValue" var="accessToken" />
+				<p>Your access token is: ${ accessToken }</p>
+				
 				<h3>User Info</h3>
 				
 				<p>The call to the User Info Endpoint returned the following set of claims:</p>
