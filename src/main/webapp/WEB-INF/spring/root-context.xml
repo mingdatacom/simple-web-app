@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:context="http://www.springframework.org/schema/context"
@@ -8,7 +7,6 @@
 	xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-2.0.xsd
-		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
 		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd
@@ -23,5 +21,153 @@
 	</security:global-method-security>
 
 	<bean id="webexpressionHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler" /> 
+
+	<!-- spring-context.xml -->
+
+	<security:http auto-config="false" use-expressions="true"
+		disable-url-rewriting="true" entry-point-ref="authenticationEntryPoint"
+		pattern="/**">
+		<security:intercept-url pattern="/views/user.jsp" access="hasRole('ROLE_USER')" />
+		
+		<security:custom-filter before="PRE_AUTH_FILTER" ref="openIdConnectAuthenticationFilter" />
+
+		<security:logout />
+
+	</security:http>
+
+	<bean id="authenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<property name="loginFormUrl" value="/openid_connect_login" />
+	</bean>
+
+	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider ref="openIdConnectAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<bean id="openIdConnectAuthenticationProvider" class="org.mitre.openid.connect.client.OIDCAuthenticationProvider">
+	</bean>
+
+	<!-- 
+	  -
+	  - The authentication filter
+	  -	
+	  -->
+	<bean id="openIdConnectAuthenticationFilter" class="org.mitre.openid.connect.client.OIDCAuthenticationFilter">
+		<property name="authenticationManager" ref="authenticationManager" />
+
+		<property name="issuerService" ref="staticIssuerService" />
+		<property name="serverConfigurationService" ref="staticServerConfigurationService" />
+		<property name="clientConfigurationService" ref="staticClientConfigurationService" />
+		<property name="authRequestOptionsService" ref="staticAuthRequestOptionsService" />
+		<property name="authRequestUrlBuilder" ref="plainAuthRequestUrlBuilder" />
+		
+	</bean>
+
+	<!-- 
+	  -
+	  -	Issuer Services: Determine which identity provider issuer is used.
+	  -	
+	  -->
+	  
+	<!-- 
+		Static issuer service, returns the same issuer for every request.
+	-->
+	<bean class="org.mitre.openid.connect.client.service.impl.StaticSingleIssuerService" id="staticIssuerService">
+		<property name="issuer" value="http://localhost:8080/openid-connect-server-webapp/" />
+	</bean>	
+
+	<!--
+	  -
+	  - Server configuration: determines the parameters and URLs of the server to talk to.	  
+	  - 
+	  -->
+
+	<!-- 
+		Static server configuration, contains a map of server configuration objects keyed by the issuer URL.
+	-->
+	<bean class="org.mitre.openid.connect.client.service.impl.StaticServerConfigurationService" id="staticServerConfigurationService">
+		<property name="servers">
+			<map>
+				<entry key="http://localhost:8080/openid-connect-server-webapp/">
+					<bean class="org.mitre.openid.connect.config.ServerConfiguration">
+						<property name="issuer" value="http://localhost:8080/openid-connect-server-webapp/" />
+						<property name="authorizationEndpointUri"	value="http://localhost:8080/openid-connect-server-webapp/authorize" />
+						<property name="tokenEndpointUri"	value="http://localhost:8080/openid-connect-server-webapp/token" />
+						<property name="userInfoUri" value="http://localhost:8080/openid-connect-server-webapp/userinfo" />
+						<property name="jwksUri" value="http://localhost:8080/openid-connect-server-webapp/jwk" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>	
+	
+	
+	<!-- 
+	  -
+	  -	Client Configuration: Determine which client identifier and credentials are used.
+	  -
+	  -->	
+
+	<!--
+		Static Client Configuration. Configures a client statically by storing configuration on a per-issuer basis.
+	-->
+
+	<bean class="org.mitre.openid.connect.client.service.impl.StaticClientConfigurationService" id="staticClientConfigurationService">
+		<property name="clients">
+			<map>
+				<entry key="http://localhost:8080/openid-connect-server-webapp/">
+					<bean class="org.mitre.oauth2.model.RegisteredClient">
+						<property name="clientId" value="87928b55-99c2-4be3-a6d1-70586ed5120e" />
+						<property name="clientSecret" value="TkhbnOmPNYnz_EeFJAG8PJdQ0p6NAdv3_Zzm75ZQJcA-IoO4z9JNFzXPThj0dVZr66p9eh4xtK3cB4xnnFe6oA" />
+						<property name="scope">
+							<set value-type="java.lang.String">
+								<value>openid</value>
+								<value>email</value>
+								<value>address</value>
+								<value>profile</value>
+								<value>phone</value>
+								<value>patient/*.read</value>
+							</set>
+						</property>
+						<property name="tokenEndpointAuthMethod" value="SECRET_BASIC" />
+						<property name="redirectUris">
+							<set>
+								<value>http://localhost:8080/simple-web-app/openid_connect_login</value>
+							</set>
+						</property>
+					</bean>
+				</entry>
+			</map>
+  		</property>
+	</bean>
+
+	<!--
+	  -
+	  -	Auth request options service: returns the optional components of the request
+	  - 
+	  -->
+	<bean class="org.mitre.openid.connect.client.service.impl.StaticAuthRequestOptionsService" id="staticAuthRequestOptionsService">
+		<property name="options">
+			<map>
+				<!-- Entries in this map are sent as key-value parameters to the auth request -->
+				<!-- 
+				<entry key="display" value="page" />
+				<entry key="max_age" value="30" />
+				<entry key="prompt" value="none" />
+				-->
+				<entry key="display" value="loginpage" />
+			</map>
+		</property>
+	</bean>
+
+	<!--
+	  -
+	  - Authorization URL Builders: create the URL to redirect the user to for authorization.
+	  - 
+	  -->
+
+	<!--	
+		Plain authorization request builder, puts all options as query parameters on the GET request
+	-->
+	<bean class="org.mitre.openid.connect.client.service.impl.PlainAuthRequestUrlBuilder" id="plainAuthRequestUrlBuilder" />
 
 </beans>
