@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
-<%@ taglib prefix="o" tagdir="/WEB-INF/tags"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,7 +84,5 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script type="text/javascript" src="resources/bootstrap2/js/bootstrap.js"></script>
-<script type="text/javascript" src="resources/js/lib/underscore.js"></script>
-<script type="text/javascript" src="resources/js/lib/jwt.js"></script>
 </body>
 </html>
